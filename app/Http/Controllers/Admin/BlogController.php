@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -31,9 +32,13 @@ class BlogController extends Controller
             'author'       => ['nullable', 'string', 'max:100'],
             'excerpt'      => ['nullable', 'string', 'max:500'],
             'body'         => ['required', 'string'],
-            'image_url'    => ['nullable', 'url', 'max:500'],
+            'image'        => ['nullable', 'image', 'max:2048'],
             'is_published' => ['boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('blogs', 'public');
+        }
 
         $data['slug']         = Str::slug($data['title']);
         $data['is_published'] = $request->boolean('is_published');
@@ -57,9 +62,18 @@ class BlogController extends Controller
             'author'       => ['nullable', 'string', 'max:100'],
             'excerpt'      => ['nullable', 'string', 'max:500'],
             'body'         => ['required', 'string'],
-            'image_url'    => ['nullable', 'url', 'max:500'],
+            'image'        => ['nullable', 'image', 'max:2048'],
             'is_published' => ['boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($blog->image) {
+                Storage::disk('public')->delete($blog->image);
+            }
+            $data['image'] = $request->file('image')->store('blogs', 'public');
+        } else {
+            unset($data['image']);
+        }
 
         $data['is_published'] = $request->boolean('is_published');
         if ($data['is_published'] && ! $blog->published_at) {
@@ -73,7 +87,12 @@ class BlogController extends Controller
 
     public function destroy(Blog $blog): RedirectResponse
     {
+        if ($blog->image) {
+            Storage::disk('public')->delete($blog->image);
+        }
+
         $blog->delete();
+
         return redirect()->route('admin.blogs.index')->with('success', 'Blog post deleted.');
     }
 }

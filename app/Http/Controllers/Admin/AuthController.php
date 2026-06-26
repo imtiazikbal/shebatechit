@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Admin;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -24,11 +26,10 @@ class AuthController extends Controller
             'password' => ['required'],
         ]);
 
-        $email    = env('ADMIN_EMAIL',    'admin@shebatech.com');
-        $password = env('ADMIN_PASSWORD', 'shebatech@admin');
+        $admin = Admin::where('email', $request->email)->first();
 
-        if ($request->email === $email && $request->password === $password) {
-            session(['admin_logged_in' => true, 'admin_email' => $request->email]);
+        if ($admin && Hash::check($request->password, $admin->password)) {
+            session(['admin_logged_in' => true, 'admin_email' => $admin->email, 'admin_name' => $admin->name]);
             return redirect()->route('admin.dashboard');
         }
 

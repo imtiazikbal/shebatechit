@@ -10,6 +10,7 @@
         <form
             method="POST"
             action="{{ $editing ? route('admin.news.update', $item) : route('admin.news.store') }}"
+            enctype="multipart/form-data"
             class="space-y-5"
         >
             @csrf
@@ -41,10 +42,22 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5">Cover Image URL</label>
-                    <input type="url" name="image_url" value="{{ old('image_url', $item->image_url) }}"
-                        class="w-full border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-all"
-                        placeholder="https://…">
+                    <label class="block text-xs font-semibold text-slate-500 uppercase tracking-widest mb-1.5">Cover Image <span class="normal-case font-normal">(JPG, PNG, WEBP — max 2MB)</span></label>
+
+                    @if($editing && $item->image)
+                    <div class="mb-3 flex items-center gap-4">
+                        <img src="{{ Storage::url($item->image) }}" alt="Current cover" class="h-24 w-40 object-cover rounded-xl border border-slate-200">
+                        <p class="text-xs text-slate-400">Current image — upload a new one to replace it.</p>
+                    </div>
+                    @endif
+
+                    <input type="file" name="image" accept="image/*"
+                        class="w-full rounded-xl px-4 py-2.5 text-slate-700 text-sm border
+                               file:mr-4 file:py-1.5 file:px-4 file:rounded-lg file:border-0
+                               file:text-xs file:font-semibold file:bg-brand/10 file:text-brand
+                               hover:file:bg-brand/20 transition-all
+                               {{ $errors->has('image') ? 'border-red-300' : 'border-slate-200' }}">
+                    @error('image')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                 </div>
 
             </div>

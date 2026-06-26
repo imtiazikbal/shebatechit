@@ -9,7 +9,7 @@ class Blog extends Model
 {
     protected $fillable = [
         'title', 'slug', 'category', 'author', 'excerpt', 'body',
-        'image_url', 'is_published', 'published_at',
+        'image', 'is_published', 'published_at',
     ];
 
     protected $casts = [

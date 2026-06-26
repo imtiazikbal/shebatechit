@@ -229,7 +229,8 @@
             <a href="/contact" class="px-7 py-3.5 rounded-xl bg-brand text-ink font-bold text-sm hover:bg-brand-dark transition-all shadow-lg shadow-brand/20">
                 Talk to Us
             </a>
-            <a href="tel:+8801XXXXXXXXX" class="px-7 py-3.5 rounded-xl border border-white/20 text-white font-semibold text-sm hover:border-brand hover:text-brand transition-all">
+            @php $svcPhone = isset($contactDetails['phone']) ? $contactDetails['phone']->first() : null; @endphp
+            <a href="tel:{{ $svcPhone ? preg_replace('/\s+/', '', $svcPhone->value) : '+8801XXXXXXXXX' }}" class="px-7 py-3.5 rounded-xl border border-white/20 text-white font-semibold text-sm hover:border-brand hover:text-brand transition-all">
                 Call Now
             </a>
         </div>

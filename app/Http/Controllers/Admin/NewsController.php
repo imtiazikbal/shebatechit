@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\News;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -29,9 +30,13 @@ class NewsController extends Controller
             'title'        => ['required', 'string', 'max:255'],
             'excerpt'      => ['nullable', 'string', 'max:500'],
             'body'         => ['required', 'string'],
-            'image_url'    => ['nullable', 'url', 'max:500'],
+            'image'        => ['nullable', 'image', 'max:2048'],
             'is_published' => ['boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('news', 'public');
+        }
 
         $data['slug']         = Str::slug($data['title']);
         $data['is_published'] = $request->boolean('is_published');
@@ -53,9 +58,18 @@ class NewsController extends Controller
             'title'        => ['required', 'string', 'max:255'],
             'excerpt'      => ['nullable', 'string', 'max:500'],
             'body'         => ['required', 'string'],
-            'image_url'    => ['nullable', 'url', 'max:500'],
+            'image'        => ['nullable', 'image', 'max:2048'],
             'is_published' => ['boolean'],
         ]);
+
+        if ($request->hasFile('image')) {
+            if ($news->image) {
+                Storage::disk('public')->delete($news->image);
+            }
+            $data['image'] = $request->file('image')->store('news', 'public');
+        } else {
+            unset($data['image']);
+        }
 
         $data['is_published'] = $request->boolean('is_published');
         if ($data['is_published'] && ! $news->published_at) {
@@ -69,7 +83,12 @@ class NewsController extends Controller
 
     public function destroy(News $news): RedirectResponse
     {
+        if ($news->image) {
+            Storage::disk('public')->delete($news->image);
+        }
+
         $news->delete();
+
         return redirect()->route('admin.news.index')->with('success', 'News item deleted.');
     }
 }
