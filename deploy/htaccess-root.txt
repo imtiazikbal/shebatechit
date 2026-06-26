@@ -1,0 +1,17 @@
+# -----------------------------------------------------------------------
+# ALTERNATIVE: If you uploaded EVERYTHING into public_html/
+# (i.e. your Laravel root IS inside public_html/)
+# -----------------------------------------------------------------------
+# Rename this file to  .htaccess  and put it in public_html/
+# This routes all requests through the public/ subfolder.
+# NOTE: This exposes your app/ config/ etc to the server — less secure.
+#       Use the proper structure (index.php + shebatech folder) instead.
+# -----------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # If request is already inside public/, leave it alone
+    RewriteCond %{REQUEST_URI} !^/public/
+    RewriteRule ^(.*)$ /public/$1 [L,QSA]
+</IfModule>

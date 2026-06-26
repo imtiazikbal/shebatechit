@@ -28,7 +28,8 @@ Route::post('/admin/logout',[Admin\AuthController::class, 'logout'])->name('admi
 Route::prefix('admin')->name('admin.')->middleware('admin')->group(function () {
     Route::get('/', [Admin\DashboardController::class, 'index'])->name('dashboard');
 
-    Route::resource('blogs',    Admin\BlogController::class)->except('show');
-    Route::resource('news',     Admin\NewsController::class)->except('show');
-    Route::resource('contacts', Admin\ContactController::class)->only(['index', 'show', 'destroy']);
+    Route::resource('blogs',           Admin\BlogController::class)->except('show');
+    Route::resource('news',            Admin\NewsController::class)->except('show');
+    Route::resource('contacts',        Admin\ContactController::class)->only(['index', 'show', 'destroy']);
+    Route::resource('contact-details', Admin\ContactDetailController::class)->except('show');
 });
